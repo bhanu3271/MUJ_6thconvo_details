@@ -858,10 +858,19 @@ function handleError(error) {
    HEADER INDEX
 ========================= */
 
+function normalizeHeader(value) {
+  return String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+}
+
 function getIndex(name) {
 
+  const target = normalizeHeader(name);
+
   return headers.findIndex(
-    h => String(h).trim().toLowerCase() === name.toLowerCase()
+    h => normalizeHeader(h) === target
   );
 
 }
@@ -1342,8 +1351,17 @@ function renderTable(data) {
     getIndex('Tracking Number');
 
 
-  const courierIndex =
+  let courierIndex =
     getIndex('Courier Partner');
+
+  /* Support common variations in the Google Sheet header */
+  if (courierIndex === -1) {
+    courierIndex = getIndex('Courier');
+  }
+
+  if (courierIndex === -1) {
+    courierIndex = getIndex('Courier Name');
+  }
 
 
   const deliveredIndex =
