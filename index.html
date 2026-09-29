@@ -1,3834 +1,1592 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
 
-<meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0"
->
-
-<title>MUJ Re-Registration Dashboard</title>
-
-<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-
-
-<style>
-
-/* =========================================================
-   GLOBAL
-========================================================= */
-
-* {
-  box-sizing: border-box;
-}
-
-:root {
-
-  --bg:#f5f6fa;
-
-  --card:#ffffff;
-
-  --ink:#222;
-
-  --ink-soft:#666;
-
-  --line:#e2e6ea;
-
-  --navy:#26415e;
-
-  --navy-deep:#182b40;
-
-  --navy-light:#e7edf3;
-
-  --gold:#c9962c;
-
-  --green:#2f7d5c;
-
-  --green-bg:#e7f3ed;
-
-  --red:#b1483f;
-
-  --red-bg:#fbebe9;
-
-  --track:#eef1f4;
-
-}
-
-
-body {
-
-  margin:0;
-
-  min-height:100vh;
-
-  font-family:Arial,sans-serif;
-
-  background:var(--bg);
-
-  color:var(--ink);
-
-}
-
-
-/* =========================================================
-   HEADER
-========================================================= */
-
-header {
-
-  background:
-    linear-gradient(
-      160deg,
-      var(--navy-deep),
-      var(--navy)
-    );
-
-  color:#f2f4f7;
-
-  padding:24px 20px 18px;
-
-}
-
-
-header .wrap {
-
-  max-width:1180px;
-
-  margin:0 auto;
-
-}
-
-
-header h1 {
-
-  font-size:24px;
-
-  margin:0 0 4px;
-
-  font-weight:600;
-
-}
-
-
-header p {
-
-  margin:0;
-
-  color:#c7d2de;
-
-  font-size:13.5px;
-
-  max-width:64ch;
-
-}
-
-
-#connectionStatus {
-
-  font-size:12px;
-
-  color:#d9e3ed;
-
-  margin-top:10px;
-
-}
-
-
-/* =========================================================
-   PAGE NAVIGATION
-========================================================= */
-
-.page-nav {
-
-  background:var(--navy-deep);
-
-  border-bottom:
-    1px solid
-    rgba(255,255,255,.12);
-
-}
-
-
-.page-nav-wrap {
-
-  max-width:1180px;
-
-  margin:0 auto;
-
-  padding:8px 20px;
-
-  display:flex;
-
-  gap:8px;
-
-  flex-wrap:wrap;
-
-}
-
-
-.page-link {
-
-  display:inline-block;
-
-  text-decoration:none;
-
-  color:#d9e3ed;
-
-  border:
-    1px solid
-    rgba(255,255,255,.18);
-
-  padding:6px 11px;
-
-  border-radius:6px;
-
-  font-size:12px;
-
-}
-
-
-.page-link:hover,
-.page-link.active {
-
-  background:var(--gold);
-
-  color:#182b40;
-
-  border-color:var(--gold);
-
-}
-
-
-/* =========================================================
-   FILTER BAR
-========================================================= */
-
-.filterbar {
-
-  position:sticky;
-
-  top:0;
-
-  z-index:10;
-
-  background:var(--card);
-
-  border-bottom:
-    1px solid
-    var(--line);
-
-  padding:10px 20px;
-
-}
-
-
-.filterbar .wrap {
-
-  max-width:1180px;
-
-  margin:0 auto;
-
-  display:flex;
-
-  gap:10px;
-
-  flex-wrap:wrap;
-
-  align-items:center;
-
-}
-
-
-.filterbar select,
-.filterbar input {
-
-  font-family:Arial,sans-serif;
-
-  font-size:13px;
-
-  padding:7px 10px;
-
-  border:
-    1px solid
-    var(--line);
-
-  border-radius:6px;
-
-  background:var(--card);
-
-  color:var(--ink);
-
-}
-
-
-.filterbar input {
-
-  min-width:230px;
-
-}
-
-
-.reset-btn,
-.refresh-btn {
-
-  font-family:Arial,sans-serif;
-
-  font-size:12px;
-
-  padding:7px 12px;
-
-  border:
-    1px solid
-    var(--line);
-
-  border-radius:6px;
-
-  background:var(--card);
-
-  color:var(--ink-soft);
-
-  cursor:pointer;
-
-}
-
-
-.reset-btn:hover,
-.refresh-btn:hover {
-
-  background:var(--navy-light);
-
-  color:var(--navy);
-
-}
-
-
-.refresh-btn {
-
-  border-color:var(--navy);
-
-  color:var(--navy);
-
-  font-weight:600;
-
-}
-
-
-.refresh-btn.loading {
-
-  opacity:.6;
-
-  cursor:not-allowed;
-
-}
-
-
-/* =========================================================
-   MAIN
-========================================================= */
-
-main {
-
-  max-width:1180px;
-
-  margin:0 auto;
-
-  padding:20px 20px 60px;
-
-}
-
-
-/* =========================================================
-   KPI CARDS
-========================================================= */
-
-.kpis {
-
-  display:grid;
-
-  grid-template-columns:
-    repeat(6,1fr);
-
-  gap:12px;
-
-  margin-bottom:28px;
-
-}
-
-
-.kpi {
-
-  background:var(--card);
-
-  border:
-    1px solid
-    var(--line);
-
-  border-radius:8px;
-
-  padding:14px 16px;
-
-  box-shadow:
-    0 4px 14px
-    rgba(20,30,45,.06);
-
-}
-
-
-.kpi .label {
-
-  font-size:11.5px;
-
-  color:var(--ink-soft);
-
-  text-transform:uppercase;
-
-  letter-spacing:.06em;
-
-}
-
-
-.kpi .value {
-
-  font-size:23px;
-
-  margin-top:5px;
-
-  font-weight:700;
-
-}
-
-
-.kpi .sub {
-
-  font-size:12px;
-
-  color:var(--ink-soft);
-
-  margin-top:3px;
-
-}
-
-
-/* =========================================================
-   SECTIONS
-========================================================= */
-
-section {
-
-  margin-bottom:30px;
-
-}
-
-
-h2 {
-
-  font-size:17px;
-
-  font-weight:700;
-
-  margin:0 0 4px;
-
-}
-
-
-.section-note {
-
-  font-size:12.5px;
-
-  color:var(--ink-soft);
-
-  margin:0 0 14px;
-
-  line-height:1.5;
-
-}
-
-
-/* =========================================================
-   TABLE
-========================================================= */
-
-.table-wrap {
-
-  overflow-x:auto;
-
-  border:
-    1px solid
-    var(--line);
-
-  border-radius:8px;
-
-  background:var(--card);
-
-}
-
-
-table {
-
-  border-collapse:collapse;
-
-  width:100%;
-
-  min-width:700px;
-
-  font-size:13px;
-
-}
-
-
-th,
-td {
-
-  padding:9px 12px;
-
-  text-align:right;
-
-  border-bottom:
-    1px solid
-    var(--line);
-
-  white-space:nowrap;
-
-}
-
-
-th:first-child,
-td:first-child {
-
-  text-align:left;
-
-}
-
-
-th {
-
-  font-size:11px;
-
-  text-transform:uppercase;
-
-  letter-spacing:.04em;
-
-  color:var(--ink-soft);
-
-  background:var(--card);
-
-}
-
-
-tbody tr:hover td {
-
-  background:var(--track);
-
-}
-
-
-tbody tr:last-child td {
-
-  border-bottom:none;
-
-}
-
-
-.empty {
-
-  padding:20px !important;
-
-  text-align:center !important;
-
-  color:var(--ink-soft);
-
-  font-size:13px;
-
-}
-
-
-/* =========================================================
-   BADGES
-========================================================= */
-
-.badge {
-
-  display:inline-block;
-
-  padding:3px 8px;
-
-  border-radius:20px;
-
-  font-size:11.5px;
-
-  white-space:nowrap;
-
-}
-
-
-.badge-blue {
-
-  background:var(--navy-light);
-
-  color:var(--navy);
-
-}
-
-
-.badge-green {
-
-  background:var(--green-bg);
-
-  color:var(--green);
-
-}
-
-
-.badge-red {
-
-  background:var(--red-bg);
-
-  color:var(--red);
-
-}
-
-
-/* =========================================================
-   SALES TYPE
-========================================================= */
-
-.sales-inside {
-
-  color:var(--navy);
-
-  font-weight:600;
-
-}
-
-
-.sales-channel {
-
-  color:var(--green);
-
-  font-weight:600;
-
-}
-
-
-.sales-other {
-
-  color:var(--ink-soft);
-
-}
-
-
-.sales-total {
-
-  font-weight:700;
-
-}
-
-
-/* =========================================================
-   COMBINATION BAR
-========================================================= */
-
-.combination-bar {
-
-  width:100%;
-
-  height:10px;
-
-  background:var(--track);
-
-  border-radius:4px;
-
-  overflow:hidden;
-
-}
-
-
-.combination-fill {
-
-  height:100%;
-
-  background:var(--navy);
-
-  border-radius:4px;
-
-}
-
-
-/* =========================================================
-   FOOTER
-========================================================= */
-
-footer {
-
-  max-width:1180px;
-
-  margin:0 auto;
-
-  padding:0 20px 30px;
-
-  font-size:11.5px;
-
-  color:var(--ink-soft);
-
-}
-
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
-
-@media (max-width:1000px) {
-
-  .kpis {
-
-    grid-template-columns:
-      repeat(3,1fr);
-
-  }
-
-}
-
-
-@media (max-width:720px) {
-
-  .kpis {
-
-    grid-template-columns:
-      repeat(2,1fr);
-
-  }
-
-
-  main {
-
-    padding-left:12px;
-
-    padding-right:12px;
-
-  }
-
-
-  .filterbar {
-
-    padding-left:12px;
-
-    padding-right:12px;
-
-  }
-
-
-  .filterbar input {
-
-    min-width:180px;
-
-    width:100%;
-
-  }
-
-
-  .page-nav-wrap {
-
-    padding-left:12px;
-
-    padding-right:12px;
-
-  }
-
-
-  header {
-
-    padding-left:12px;
-
-    padding-right:12px;
-
-  }
-
-
-  header h1 {
-
-    font-size:21px;
-
-  }
-
-}
-
-</style>
+  <base target="_top">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>MUJ Convocation Dashboard</title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f7fb;
+      color: #1f2937;
+    }
+
+    .container {
+      max-width: 1500px;
+      margin: auto;
+      padding: 24px;
+    }
+
+    /* HEADER */
+
+    .header {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .title-section h1 {
+      margin: 0;
+      font-size: 28px;
+      color: #111827;
+    }
+
+    .title-section p {
+      margin: 6px 0 0;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .refresh-btn {
+      border: none;
+      background: #111827;
+      color: white;
+      padding: 11px 18px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .refresh-btn:hover {
+      background: #374151;
+    }
+
+    /* KPI */
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .kpi {
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+    }
+
+    .kpi-label {
+      color: #6b7280;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .kpi-value {
+      font-size: 30px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .kpi-sub {
+      margin-top: 5px;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    /* FILTERS */
+
+    .filter-card {
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .input,
+    .select {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      background: white;
+      outline: none;
+    }
+
+    .input:focus,
+    .select:focus {
+      border-color: #6b7280;
+    }
+
+    /* TABLE */
+
+    .table-card {
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+
+    .table-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-title {
+      font-weight: 700;
+    }
+
+    .record-count {
+      color: #6b7280;
+      font-size: 13px;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1100px;
+    }
+
+    th {
+      background: #f9fafb;
+      text-align: left;
+      padding: 13px 14px;
+      font-size: 12px;
+      color: #6b7280;
+      border-bottom: 1px solid #e5e7eb;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 14px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    tr:hover td {
+      background: #fafafa;
+    }
+
+    /* BADGES */
+
+    .badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .green {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .yellow {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .blue {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .gray {
+      background: #f3f4f6;
+      color: #4b5563;
+    }
+
+    .red {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    /* LOADING */
+
+    .loading {
+      padding: 50px;
+      text-align: center;
+      color: #6b7280;
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    /* EMPTY */
+
+    .empty {
+      text-align: center;
+      padding: 50px;
+      color: #6b7280;
+    }
+
+    /* RESPONSIVE */
+
+    @media(max-width: 1100px) {
+
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .filter-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+    }
+
+    @media(max-width: 600px) {
+
+      .container {
+        padding: 12px;
+      }
+
+      .header {
+        padding: 18px;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .title-section h1 {
+        font-size: 22px;
+      }
+
+      .kpi-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .kpi {
+        padding: 15px;
+      }
+
+      .kpi-value {
+        font-size: 23px;
+      }
+
+      .filter-grid {
+        grid-template-columns: 1fr;
+      }
+
+    }
+
+  </style>
 
 </head>
 
 
 <body>
 
+<div class="container">
 
-<!-- =========================================================
-     HEADER
-========================================================= -->
+  <!-- HEADER -->
 
-<header>
+  <div class="header">
 
-  <div class="wrap">
+    <div class="title-section">
 
-    <h1>
-      MUJ Re-Registration Dashboard
-    </h1>
+      <h1>MUJ Convocation Dashboard</h1>
 
-    <p>
-      Aug - Sep 2026
-    </p>
+      <p>
+        Convocation & Degree Dispatch Visibility
+      </p>
 
-    <div id="connectionStatus">
-      Connecting to Google Sheet…
     </div>
 
-  </div>
-
-</header>
-
-
-<!-- =========================================================
-     PAGE NAVIGATION
-========================================================= -->
-
-<div class="page-nav">
-
-  <div class="page-nav-wrap">
-
-    <a
-      class="page-link active"
-      href="index.html"
-    >
-      Page 1 · Learner Dashboard
-    </a>
-
-
-    <a
-      class="page-link"
-      href="page2.html"
-    >
-      Page 2 · Re-Registration Analysis
-    </a>
-
-  </div>
-
-</div>
-
-
-<!-- =========================================================
-     FILTER BAR
-========================================================= -->
-
-<div class="filterbar">
-
-  <div class="wrap">
-
-    <select id="programFilter">
-
-      <option value="">
-        All Programs
-      </option>
-
-    </select>
-
-
-    <select id="semesterFilter">
-
-      <option value="">
-        All Semesters
-      </option>
-
-    </select>
-
-
-    <select id="examFilter">
-
-      <option value="">
-        All Exam Attendance
-      </option>
-
-      <option value="Present">
-        Exam Attended
-      </option>
-
-      <option value="Absent">
-        Exam Not Attended
-      </option>
-
-    </select>
-
-
-    <select id="assignmentFilter">
-
-      <option value="">
-        All Assignment Status
-      </option>
-
-      <option value="Submitted">
-        Submitted
-      </option>
-
-      <option value="Not Submitted">
-        Not Submitted
-      </option>
-
-    </select>
-
-
-    <select id="reregFilter">
-
-      <option value="">
-        All Re-Reg Status
-      </option>
-
-      <option value="Done">
-        Done
-      </option>
-
-      <option value="Not Done">
-        Not Done
-      </option>
-
-    </select>
-
-
-    <input
-      type="text"
-      id="searchInput"
-      placeholder="Search Roll No or Learner Name…"
-    >
-
-
-    <button
-      id="resetBtn"
-      class="reset-btn"
-      type="button"
-    >
-      Reset Filters
-    </button>
-
-
-    <button
-      id="refreshBtn"
-      class="refresh-btn"
-      type="button"
-    >
-      ↻ Refresh Now
+    <button class="refresh-btn" onclick="loadData()">
+      ↻ Refresh
     </button>
 
   </div>
 
-</div>
+
+  <!-- ERROR -->
+
+  <div id="error" class="error"></div>
 
 
-<!-- =========================================================
-     MAIN
-========================================================= -->
+  <!-- KPI -->
 
-<main>
+  <div class="kpi-grid">
 
+    <div class="kpi">
 
-<!-- =========================================================
-     KPI CARDS
-========================================================= -->
+      <div class="kpi-label">
+        Total Learners
+      </div>
 
-<div class="kpis">
+      <div class="kpi-value" id="totalLearners">
+        0
+      </div>
 
+      <div class="kpi-sub">
+        All learners
+      </div>
 
-  <div class="kpi">
-
-    <div class="label">
-      Total Learners
     </div>
 
-    <div
-      class="value"
-      id="kpiTotal"
-    >
-      0
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        Attended In Person
+      </div>
+
+      <div class="kpi-value" id="attended">
+        0
+      </div>
+
+      <div class="kpi-sub" id="attendancePercent">
+        0%
+      </div>
+
     </div>
 
-    <div class="sub">
-      Filtered learners
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        Not Attended
+      </div>
+
+      <div class="kpi-value" id="notAttended">
+        0
+      </div>
+
+      <div class="kpi-sub">
+        Learners absent
+      </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        Degree Dispatched
+      </div>
+
+      <div class="kpi-value" id="dispatched">
+        0
+      </div>
+
+      <div class="kpi-sub" id="dispatchPercent">
+        0%
+      </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        Dispatch Pending
+      </div>
+
+      <div class="kpi-value" id="pending">
+        0
+      </div>
+
+      <div class="kpi-sub">
+        No tracking number
+      </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        Delivered
+      </div>
+
+      <div class="kpi-value" id="delivered">
+        0
+      </div>
+
+      <div class="kpi-sub" id="deliveryPercent">
+        0%
+      </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        In Transit
+      </div>
+
+      <div class="kpi-value" id="inTransit">
+        0
+      </div>
+
+      <div class="kpi-sub">
+        Dispatched but not delivered
+      </div>
+
+    </div>
+
+
+    <div class="kpi">
+
+      <div class="kpi-label">
+        Last Updated
+      </div>
+
+      <div class="kpi-value" id="lastUpdated" style="font-size:18px;">
+        —
+      </div>
+
+      <div class="kpi-sub">
+        Dashboard data
+      </div>
+
     </div>
 
   </div>
 
 
-  <div class="kpi">
+  <!-- FILTERS -->
 
-    <div class="label">
-      Exam Attended
-    </div>
+  <div class="filter-card">
 
-    <div
-      class="value"
-      id="kpiExam"
-    >
-      0
-    </div>
+    <div class="filter-grid">
 
-    <div class="sub">
-      Full / partial attended
-    </div>
-
-  </div>
+      <input
+        id="search"
+        class="input"
+        type="text"
+        placeholder="Search Roll No, Name or Tracking Number..."
+        oninput="applyFilters()"
+      >
 
 
-  <div class="kpi">
+      <select
+        id="programFilter"
+        class="select"
+        onchange="applyFilters()"
+      >
 
-    <div class="label">
-      Assignment Submitted
-    </div>
+        <option value="">
+          All Programs
+        </option>
 
-    <div
-      class="value"
-      id="kpiAssignment"
-    >
-      0
-    </div>
-
-    <div class="sub">
-      IA submitted
-    </div>
-
-  </div>
+      </select>
 
 
-  <div class="kpi">
+      <select
+        id="dateFilter"
+        class="select"
+        onchange="applyFilters()"
+      >
 
-    <div class="label">
-      Re-Reg Done
-    </div>
+        <option value="">
+          All Convocation Dates
+        </option>
 
-    <div
-      class="value"
-      id="kpiDone"
-    >
-      0
-    </div>
-
-    <div class="sub">
-      Completed
-    </div>
-
-  </div>
+      </select>
 
 
-  <div class="kpi">
+      <select
+        id="attendanceFilter"
+        class="select"
+        onchange="applyFilters()"
+      >
 
-    <div class="label">
-      Re-Reg Not Done
-    </div>
+        <option value="">
+          All Attendance
+        </option>
 
-    <div
-      class="value"
-      id="kpiNotDone"
-    >
-      0
-    </div>
-
-    <div class="sub">
-      Pending
-    </div>
-
-  </div>
+      </select>
 
 
-  <div class="kpi">
+      <select
+        id="statusFilter"
+        class="select"
+        onchange="applyFilters()"
+      >
 
-    <div class="label">
-      Re-Reg %
-    </div>
+        <option value="">
+          All Dispatch Status
+        </option>
 
-    <div
-      class="value"
-      id="kpiPercent"
-    >
-      0.0%
-    </div>
+        <option value="Dispatched">
+          Dispatched
+        </option>
 
-    <div class="sub">
-      Done / total
+        <option value="Pending">
+          Dispatch Pending
+        </option>
+
+        <option value="Delivered">
+          Delivered
+        </option>
+
+        <option value="In Transit">
+          In Transit
+        </option>
+
+      </select>
+
     </div>
 
   </div>
 
 
-</div>
+  <!-- TABLE -->
 
+  <div class="table-card">
 
-<!-- =========================================================
-     SEMESTER-WISE PERFORMANCE
-========================================================= -->
+    <div class="table-header">
 
-<section>
+      <div class="table-title">
+        Learner Details
+      </div>
 
-  <h2>
-    Semester-wise Performance
-  </h2>
+      <div class="record-count" id="recordCount">
+        0 records
+      </div>
 
-  <p class="section-note">
-    Semester-wise learner count with exam attendance,
-    assignment submission and re-registration status.
-  </p>
+    </div>
 
 
-  <div class="table-wrap">
+    <div class="table-wrapper">
 
-    <table>
+      <table>
 
-      <thead>
-
-        <tr>
-
-          <th>
-            Semester
-          </th>
-
-          <th>
-            Total Learners
-          </th>
-
-          <th>
-            Exam Attended
-          </th>
-
-          <th>
-            Exam %
-          </th>
-
-          <th>
-            Assignment Submitted
-          </th>
-
-          <th>
-            Assignment %
-          </th>
-
-          <th>
-            Re-Reg Done
-          </th>
-
-          <th>
-            Re-Reg %
-          </th>
-
-        </tr>
-
-      </thead>
-
-      <tbody id="semesterBody"></tbody>
-
-    </table>
-
-  </div>
-
-</section>
-
-
-<!-- =========================================================
-     SALES TYPE
-========================================================= -->
-
-<section>
-
-  <h2>
-    Sales Type Bifurcation — Semester-wise
-  </h2>
-
-  <p class="section-note">
-    Semester-wise Sales Type breakdown. Each value shows
-    count followed by the percentage of that Sales Type
-    within the selected semester.
-  </p>
-
-
-  <div class="table-wrap">
-
-    <table>
-
-      <thead>
-
-        <tr>
-
-          <th>
-            Semester
-          </th>
-
-          <th>
-            Sales Type
-          </th>
-
-          <th>
-            Total
-          </th>
-
-          <th>
-            Exam Attended
-          </th>
-
-          <th>
-            Exam Not Attended
-          </th>
-
-          <th>
-            Assignment Submitted
-          </th>
-
-          <th>
-            Assignment Not Submitted
-          </th>
-
-          <th>
-            Re-Reg Done
-          </th>
-
-          <th>
-            Re-Reg Not Done
-          </th>
-
-        </tr>
-
-      </thead>
-
-      <tbody id="salesBody"></tbody>
-
-    </table>
-
-  </div>
-
-</section>
-
-
-<!-- =========================================================
-     STATUS COMBINATION
-========================================================= -->
-
-<section>
-
-  <h2>
-    Learner Status Combination
-  </h2>
-
-  <p class="section-note">
-    Combination of exam attendance, assignment submission
-    and re-registration status for the currently filtered learners.
-  </p>
-
-
-  <div class="table-wrap">
-
-    <table>
-
-      <thead>
-
-        <tr>
-
-          <th>
-            Status Combination
-          </th>
-
-          <th>
-            Count
-          </th>
-
-          <th>
-            %
-          </th>
-
-          <th>
-            Distribution
-          </th>
-
-        </tr>
-
-      </thead>
-
-      <tbody id="combinationBody"></tbody>
-
-    </table>
-
-  </div>
-
-</section>
-
-
-<!-- =========================================================
-     LEARNER DETAILS
-========================================================= -->
-
-<section>
-
-  <h2>
-    Learner Details
-  </h2>
-
-  <p class="section-note">
-    Learner-level details based on the selected filters.
-  </p>
-
-
-  <div class="table-wrap">
-
-    <table>
-
-      <thead>
-
-        <tr>
-
-          <th>
-            Roll No
-          </th>
-
-          <th>
-            Name
-          </th>
-
-          <th>
-            Program
-          </th>
-
-          <th>
-            Sales Type
-          </th>
-
-          <th>
-            Exam Attendance
-          </th>
-
-          <th>
-            Assignment
-          </th>
-
-          <th>
-            Current Sem
-          </th>
-
-          <th>
-            Re-Reg
-          </th>
-
-        </tr>
-
-      </thead>
-
-      <tbody id="learnerBody"></tbody>
-
-    </table>
-
-  </div>
-
-</section>
-
-
-</main>
-
-
-<footer>
-
-  Data source: Google Sheets · Sheet1 ·
-  Auto-refresh every 5 minutes.
-  Exam Attended = Full Attended / Partially Attended
-  from Mock Status.
-  Sales Type = IS → Inside Sales, DA → Channel.
-
-</footer>
-
-
-<script>
-
-
-/* =========================================================
-   GOOGLE SHEET CONFIGURATION
-========================================================= */
-
-const GOOGLE_SHEET_ID =
-  '1iwtwKK5JAG-qDRnjcMf5GGL5CMBMW9X3QFYtaawvCqg';
-
-
-const SHEET_NAME =
-  'Sheet1';
-
-
-/*
-   AUTO REFRESH
-
-   5 minutes
-   = 5 × 60 × 1000
-   = 300000 milliseconds
-*/
-
-const REFRESH_MS =
-  5 * 60 * 1000;
-
-
-/* =========================================================
-   GLOBAL DATA
-========================================================= */
-
-let RAW = [];
-
-let refreshTimer = null;
-
-let refreshBusy = false;
-
-
-/* =========================================================
-   BASIC HELPERS
-========================================================= */
-
-function norm(value) {
-
-  return String(
-    value ?? ''
-  ).trim();
-
-}
-
-
-function key(value) {
-
-  return norm(value)
-    .toLowerCase()
-    .replace(
-      /[\s._-]+/g,
-      ' '
-    )
-    .trim();
-
-}
-
-
-/* =========================================================
-   FIND COLUMN
-========================================================= */
-
-function findColumn(
-  headers,
-  aliases
-) {
-
-  const normalizedHeaders =
-    headers.map(
-      header => ({
-
-        original:header,
-
-        normalized:key(header)
-
-      })
-    );
-
-
-  for (
-    const alias of aliases
-  ) {
-
-    const aliasKey =
-      key(alias);
-
-
-    const found =
-      normalizedHeaders.find(
-        header =>
-          header.normalized ===
-          aliasKey
-      );
-
-
-    if (found) {
-
-      return found.original;
-
-    }
-
-  }
-
-
-  return null;
-
-}
-
-
-/* =========================================================
-   CLEAN ROLL NUMBER
-========================================================= */
-
-function cleanRollNo(value) {
-
-  if (
-    value === null ||
-    value === undefined
-  ) {
-
-    return '';
-
-  }
-
-
-  let result =
-    String(value).trim();
-
-
-  if (
-    /^\d+\.0$/.test(result)
-  ) {
-
-    result =
-      result.replace(
-        /\.0$/,
-        ''
-      );
-
-  }
-
-
-  return result;
-
-}
-
-
-/* =========================================================
-   EXAM ATTENDANCE
-========================================================= */
-
-function normalizeExam(value) {
-
-  const s =
-    norm(value).toLowerCase();
-
-
-  if (
-    s.includes('full attended') ||
-    s.includes('partially attended')
-  ) {
-
-    return 'Present';
-
-  }
-
-
-  return 'Absent';
-
-}
-
-
-/* =========================================================
-   ASSIGNMENT STATUS
-========================================================= */
-
-function normalizeAssignment(value) {
-
-  const s =
-    norm(value).toLowerCase();
-
-
-  if (
-    s.includes('submitted') ||
-    s === 'yes' ||
-    s === 'done' ||
-    s === 'completed' ||
-    s === 'complete' ||
-    s === 'true' ||
-    s === '1'
-  ) {
-
-    return 'Submitted';
-
-  }
-
-
-  return 'Not Submitted';
-
-}
-
-
-/* =========================================================
-   RE-REGISTRATION STATUS
-========================================================= */
-
-function normalizeReReg(value) {
-
-  const s =
-    norm(value).toLowerCase();
-
-
-  if (
-    s === 'paid' ||
-    s === 'done' ||
-    s === 'yes' ||
-    s === 'completed' ||
-    s === 'registered'
-  ) {
-
-    return 'Done';
-
-  }
-
-
-  return 'Not Done';
-
-}
-
-
-/* =========================================================
-   SALES TYPE
-========================================================= */
-
-function normalizeSalesType(value) {
-
-  const s =
-    key(value);
-
-
-  if (s === 'is') {
-
-    return 'Inside Sales';
-
-  }
-
-
-  if (s === 'da') {
-
-    return 'Channel';
-
-  }
-
-
-  if (!s) {
-
-    return 'Other';
-
-  }
-
-
-  return norm(value);
-
-}
-
-
-/* =========================================================
-   NORMALIZE GOOGLE SHEET DATA
-========================================================= */
-
-function normalizeRows(rows) {
-
-  if (
-    !rows ||
-    !rows.length
-  ) {
-
-    throw new Error(
-      'Sheet1 is empty.'
-    );
-
-  }
-
-
-  const headers =
-    Object.keys(
-      rows[0]
-    ).map(norm);
-
-
-  /* =======================================================
-     COLUMN MAPPING
-  ======================================================= */
-
-  const programCol =
-    findColumn(
-      headers,
-      [
-        'Program',
-        'Program Name'
-      ]
-    );
-
-
-  const rollCol =
-    findColumn(
-      headers,
-      [
-        'Roll No',
-        'Roll Number',
-        'Roll_No',
-        'Roll',
-        'Roll No.',
-        'Contact Roll No',
-        'Contact Roll No.',
-        'Contact_Roll_No',
-        'Contact.Roll No',
-        'Contact Roll Number',
-        'Roll_No__c',
-        'Contact__r.Roll_No__c'
-      ]
-    );
-
-
-  const nameCol =
-    findColumn(
-      headers,
-      [
-        'Learner Name',
-        'Name',
-        'Student Name',
-        'Full Name'
-      ]
-    );
-
-
-  const leadCol =
-    findColumn(
-      headers,
-      [
-        'Lead Name'
-      ]
-    );
-
-
-  const semesterCol =
-    findColumn(
-      headers,
-      [
-        'Current Semester',
-        'Semester',
-        'Current Sem',
-        'Sem'
-      ]
-    );
-
-
-  const mockCol =
-    findColumn(
-      headers,
-      [
-        'Mock Status'
-      ]
-    );
-
-
-  const iaCol =
-    findColumn(
-      headers,
-      [
-        'IA Status'
-      ]
-    );
-
-
-  const reregCol =
-    findColumn(
-      headers,
-      [
-        'Re reg status',
-        'Re-Reg',
-        'Re Reg',
-        'Re-reg',
-        'Re Registration',
-        'Re-Registration',
-        'Rereg'
-      ]
-    );
-
-
-  /* =======================================================
-     REQUIRED COLUMNS
-  ======================================================= */
-
-  const required = [];
-
-
-  if (!programCol) {
-
-    required.push(
-      'Program'
-    );
-
-  }
-
-
-  if (!semesterCol) {
-
-    required.push(
-      'Semester'
-    );
-
-  }
-
-
-  if (!mockCol) {
-
-    required.push(
-      'Mock Status'
-    );
-
-  }
-
-
-  if (!iaCol) {
-
-    required.push(
-      'IA Status'
-    );
-
-  }
-
-
-  if (!reregCol) {
-
-    required.push(
-      'Re reg status'
-    );
-
-  }
-
-
-  if (!leadCol) {
-
-    required.push(
-      'Lead Name'
-    );
-
-  }
-
-
-  if (required.length) {
-
-    throw new Error(
-      'Missing required column(s): ' +
-      required.join(', ')
-    );
-
-  }
-
-
-  /* =======================================================
-     CREATE NORMALIZED ROWS
-  ======================================================= */
-
-  return rows
-
-    .map(row => {
-
-      const rollNo =
-        rollCol
-          ? cleanRollNo(
-              row[rollCol]
-            )
-          : '';
-
-
-      const name =
-        nameCol
-          ? norm(
-              row[nameCol]
-            )
-          : '';
-
-
-      const program =
-        norm(
-          row[programCol]
-        );
-
-
-      const semester =
-        norm(
-          row[semesterCol]
-        ) ||
-        'Not Specified';
-
-
-      const leadName =
-        norm(
-          row[leadCol]
-        );
-
-
-      const mockStatus =
-        norm(
-          row[mockCol]
-        );
-
-
-      const iaStatus =
-        norm(
-          row[iaCol]
-        );
-
-
-      const reRegRaw =
-        norm(
-          row[reregCol]
-        );
-
-
-      return {
-
-        rollNo,
-
-        name,
-
-        program,
-
-        semester,
-
-        leadName,
-
-        salesType:
-          normalizeSalesType(
-            leadName
-          ),
-
-        mockStatus,
-
-        examAttendance:
-          normalizeExam(
-            mockStatus
-          ),
-
-        iaStatus,
-
-        assignment:
-          normalizeAssignment(
-            iaStatus
-          ),
-
-        reRegRaw,
-
-        reReg:
-          normalizeReReg(
-            reRegRaw
-          )
-
-      };
-
-    })
-
-    .filter(
-      row =>
-        row.rollNo ||
-        row.name ||
-        row.program
-    );
-
-}
-
-
-/* =========================================================
-   GOOGLE SHEET CSV URL
-========================================================= */
-
-function googleSheetCsvUrl() {
-
-  /*
-     Timestamp is added to reduce the possibility
-     of an old cached Google Sheet response.
-  */
-
-  const cacheBust =
-    Date.now();
-
-
-  return (
-    'https://docs.google.com/spreadsheets/d/' +
-
-    encodeURIComponent(
-      GOOGLE_SHEET_ID
-    ) +
-
-    '/gviz/tq?tqx=out:csv&sheet=' +
-
-    encodeURIComponent(
-      SHEET_NAME
-    ) +
-
-    '&cacheBust=' +
-
-    cacheBust
-  );
-
-}
-
-
-/* =========================================================
-   FETCH GOOGLE SHEET
-========================================================= */
-
-async function fetchSheet() {
-
-  const url =
-    googleSheetCsvUrl();
-
-
-  const response =
-    await fetch(
-      url,
-      {
-        cache:'no-store',
-
-        headers:{
-          'Cache-Control':
-            'no-cache'
-        }
-      }
-    );
-
-
-  if (!response.ok) {
-
-    throw new Error(
-      'Could not read Google Sheet. HTTP ' +
-      response.status
-    );
-
-  }
-
-
-  const csv =
-    await response.text();
-
-
-  if (!csv.trim()) {
-
-    throw new Error(
-      'Google Sheet is empty.'
-    );
-
-  }
-
-
-  const workbook =
-    XLSX.read(
-      csv,
-      {
-        type:'string',
-
-        raw:true
-      }
-    );
-
-
-  if (
-    !workbook.SheetNames.length
-  ) {
-
-    throw new Error(
-      'No sheet found.'
-    );
-
-  }
-
-
-  const sheet =
-    workbook.Sheets[
-      workbook.SheetNames[0]
-    ];
-
-
-  return XLSX.utils.sheet_to_json(
-    sheet,
-    {
-      defval:'',
-      raw:true
-    }
-  );
-
-}
-
-
-/* =========================================================
-   UNIQUE SORTED VALUES
-========================================================= */
-
-function uniqueSorted(field) {
-
-  const values =
-    [
-      ...new Set(
-        RAW
-          .map(
-            row =>
-              row[field]
-          )
-          .filter(Boolean)
-      )
-    ];
-
-
-  return values.sort(
-    (a,b) =>
-      String(a).localeCompare(
-        String(b),
-        undefined,
-        {
-          numeric:true,
-
-          sensitivity:'base'
-        }
-      )
-  );
-
-}
-
-
-/* =========================================================
-   POPULATE FILTERS
-========================================================= */
-
-function populateFilters() {
-
-  populateSelect(
-    'programFilter',
-
-    uniqueSorted('program'),
-
-    'All Programs'
-  );
-
-
-  populateSelect(
-    'semesterFilter',
-
-    uniqueSorted('semester'),
-
-    'All Semesters'
-  );
-
-}
-
-
-/* =========================================================
-   POPULATE SELECT
-========================================================= */
-
-function populateSelect(
-  id,
-  values,
-  firstText
-) {
-
-  const select =
-    document.getElementById(id);
-
-
-  /*
-     Preserve the user's existing selection
-     during the 5-minute refresh.
-  */
-
-  const oldValue =
-    select.value;
-
-
-  select.innerHTML =
-    '';
-
-
-  const defaultOption =
-    document.createElement(
-      'option'
-    );
-
-
-  defaultOption.value =
-    '';
-
-
-  defaultOption.textContent =
-    firstText;
-
-
-  select.appendChild(
-    defaultOption
-  );
-
-
-  values.forEach(value => {
-
-    const option =
-      document.createElement(
-        'option'
-      );
-
-
-    option.value =
-      value;
-
-
-    option.textContent =
-      value;
-
-
-    select.appendChild(
-      option
-    );
-
-  });
-
-
-  if (
-    values.includes(
-      oldValue
-    )
-  ) {
-
-    select.value =
-      oldValue;
-
-  } else {
-
-    select.value =
-      '';
-
-  }
-
-}
-
-
-/* =========================================================
-   GET FILTERS
-========================================================= */
-
-function getFilters() {
-
-  return {
-
-    program:
-      document.getElementById(
-        'programFilter'
-      ).value,
-
-
-    semester:
-      document.getElementById(
-        'semesterFilter'
-      ).value,
-
-
-    exam:
-      document.getElementById(
-        'examFilter'
-      ).value,
-
-
-    assignment:
-      document.getElementById(
-        'assignmentFilter'
-      ).value,
-
-
-    rereg:
-      document.getElementById(
-        'reregFilter'
-      ).value,
-
-
-    search:
-      document.getElementById(
-        'searchInput'
-      ).value
-      .toLowerCase()
-      .trim()
-
-  };
-
-}
-
-
-/* =========================================================
-   ROW MATCHING
-========================================================= */
-
-function rowMatches(
-  row,
-  filters,
-  ignoreSemester = false
-) {
-
-  if (
-    filters.program &&
-    row.program !==
-      filters.program
-  ) {
-
-    return false;
-
-  }
-
-
-  if (
-    !ignoreSemester &&
-    filters.semester &&
-    row.semester !==
-      filters.semester
-  ) {
-
-    return false;
-
-  }
-
-
-  if (
-    filters.exam &&
-    row.examAttendance !==
-      filters.exam
-  ) {
-
-    return false;
-
-  }
-
-
-  if (
-    filters.assignment &&
-    row.assignment !==
-      filters.assignment
-  ) {
-
-    return false;
-
-  }
-
-
-  if (
-    filters.rereg &&
-    row.reReg !==
-      filters.rereg
-  ) {
-
-    return false;
-
-  }
-
-
-  if (filters.search) {
-
-    const searchable =
-      (
-        row.rollNo +
-        ' ' +
-        row.name
-      ).toLowerCase();
-
-
-    if (
-      !searchable.includes(
-        filters.search
-      )
-    ) {
-
-      return false;
-
-    }
-
-  }
-
-
-  return true;
-
-}
-
-
-/* =========================================================
-   FILTERED ROWS
-========================================================= */
-
-function getFilteredRows() {
-
-  const filters =
-    getFilters();
-
-
-  return RAW.filter(
-    row =>
-      rowMatches(
-        row,
-        filters,
-        false
-      )
-  );
-
-}
-
-
-/* =========================================================
-   KPI RENDER
-========================================================= */
-
-function renderKPIs() {
-
-  const rows =
-    getFilteredRows();
-
-
-  const total =
-    rows.length;
-
-
-  const exam =
-    rows.filter(
-      row =>
-        row.examAttendance ===
-        'Present'
-    ).length;
-
-
-  const assignment =
-    rows.filter(
-      row =>
-        row.assignment ===
-        'Submitted'
-    ).length;
-
-
-  const done =
-    rows.filter(
-      row =>
-        row.reReg ===
-        'Done'
-    ).length;
-
-
-  const notDone =
-    total - done;
-
-
-  const percentage =
-    total
-      ? (
-          done /
-          total *
-          100
-        )
-      : 0;
-
-
-  document.getElementById(
-    'kpiTotal'
-  ).textContent =
-    total.toLocaleString();
-
-
-  document.getElementById(
-    'kpiExam'
-  ).textContent =
-    exam.toLocaleString();
-
-
-  document.getElementById(
-    'kpiAssignment'
-  ).textContent =
-    assignment.toLocaleString();
-
-
-  document.getElementById(
-    'kpiDone'
-  ).textContent =
-    done.toLocaleString();
-
-
-  document.getElementById(
-    'kpiNotDone'
-  ).textContent =
-    notDone.toLocaleString();
-
-
-  document.getElementById(
-    'kpiPercent'
-  ).textContent =
-    percentage.toFixed(1) +
-    '%';
-
-}
-
-
-/* =========================================================
-   SEMESTER-WISE PERFORMANCE
-========================================================= */
-
-function renderSemesterAnalysis() {
-
-  const filters =
-    getFilters();
-
-
-  const rows =
-    RAW.filter(
-      row =>
-        rowMatches(
-          row,
-          filters,
-          true
-        )
-    );
-
-
-  const map =
-    new Map();
-
-
-  rows.forEach(row => {
-
-    const semester =
-      row.semester ||
-      'Not Specified';
-
-
-    if (
-      !map.has(
-        semester
-      )
-    ) {
-
-      map.set(
-        semester,
-        {
-          total:0,
-
-          exam:0,
-
-          assignment:0,
-
-          rereg:0
-        }
-      );
-
-    }
-
-
-    const item =
-      map.get(
-        semester
-      );
-
-
-    item.total++;
-
-
-    if (
-      row.examAttendance ===
-      'Present'
-    ) {
-
-      item.exam++;
-
-    }
-
-
-    if (
-      row.assignment ===
-      'Submitted'
-    ) {
-
-      item.assignment++;
-
-    }
-
-
-    if (
-      row.reReg ===
-      'Done'
-    ) {
-
-      item.rereg++;
-
-    }
-
-  });
-
-
-  const semesters =
-    [...map.keys()].sort(
-      (a,b) =>
-        String(a).localeCompare(
-          String(b),
-          undefined,
-          {
-            numeric:true
-          }
-        )
-    );
-
-
-  const tbody =
-    document.getElementById(
-      'semesterBody'
-    );
-
-
-  if (
-    !semesters.length
-  ) {
-
-    tbody.innerHTML =
-      `
-      <tr>
-
-        <td
-          colspan="8"
-          class="empty"
-        >
-          No data available.
-        </td>
-
-      </tr>
-      `;
-
-    return;
-
-  }
-
-
-  tbody.innerHTML =
-    semesters.map(
-      semester => {
-
-        const item =
-          map.get(
-            semester
-          );
-
-
-        const examPct =
-          item.total
-            ? (
-                item.exam /
-                item.total *
-                100
-              )
-            : 0;
-
-
-        const assignmentPct =
-          item.total
-            ? (
-                item.assignment /
-                item.total *
-                100
-              )
-            : 0;
-
-
-        const reregPct =
-          item.total
-            ? (
-                item.rereg /
-                item.total *
-                100
-              )
-            : 0;
-
-
-        return `
+        <thead>
 
           <tr>
 
-            <td>
+            <th>Roll No</th>
 
-              <span
-                class="badge badge-blue"
-              >
-                ${escapeHtml(
-                  semester
-                )}
-              </span>
+            <th>Name</th>
 
-            </td>
+            <th>Program</th>
 
+            <th>Convocation Date</th>
 
-            <td>
-              ${item.total.toLocaleString()}
-            </td>
+            <th>Attendance</th>
 
+            <th>Dispatch Status</th>
 
-            <td>
-              ${item.exam.toLocaleString()}
-            </td>
+            <th>Tracking Number</th>
 
+            <th>Courier Partner</th>
 
-            <td>
-              ${examPct.toFixed(1)}%
-            </td>
+            <th>Delivery</th>
 
+            <th>Dispatch Date</th>
 
-            <td>
-              ${item.assignment.toLocaleString()}
-            </td>
-
-
-            <td>
-              ${assignmentPct.toFixed(1)}%
-            </td>
-
-
-            <td>
-              ${item.rereg.toLocaleString()}
-            </td>
-
-
-            <td>
-              ${reregPct.toFixed(1)}%
-            </td>
+            <th>Address</th>
 
           </tr>
 
-        `;
+        </thead>
 
-      }
-    ).join('');
 
-}
-
-
-/* =========================================================
-   SALES TYPE BIFURCATION
-========================================================= */
-
-function renderSalesType() {
-
-  const filters =
-    getFilters();
-
-
-  const rows =
-    RAW.filter(
-      row =>
-        rowMatches(
-          row,
-          filters,
-          true
-        )
-    );
-
-
-  const map =
-    new Map();
-
-
-  rows.forEach(row => {
-
-    const semester =
-      row.semester ||
-      'Not Specified';
-
-
-    const salesType =
-      row.salesType ||
-      'Other';
-
-
-    if (
-      !map.has(
-        semester
-      )
-    ) {
-
-      map.set(
-        semester,
-        new Map()
-      );
-
-    }
-
-
-    const semesterMap =
-      map.get(
-        semester
-      );
-
-
-    if (
-      !semesterMap.has(
-        salesType
-      )
-    ) {
-
-      semesterMap.set(
-        salesType,
-        {
-
-          total:0,
-
-          examAttended:0,
-
-          examNotAttended:0,
-
-          assignmentSubmitted:0,
-
-          assignmentNotSubmitted:0,
-
-          reRegDone:0,
-
-          reRegNotDone:0
-
-        }
-      );
-
-    }
-
-
-    const item =
-      semesterMap.get(
-        salesType
-      );
-
-
-    item.total++;
-
-
-    if (
-      row.examAttendance ===
-      'Present'
-    ) {
-
-      item.examAttended++;
-
-    } else {
-
-      item.examNotAttended++;
-
-    }
-
-
-    if (
-      row.assignment ===
-      'Submitted'
-    ) {
-
-      item.assignmentSubmitted++;
-
-    } else {
-
-      item.assignmentNotSubmitted++;
-
-    }
-
-
-    if (
-      row.reReg ===
-      'Done'
-    ) {
-
-      item.reRegDone++;
-
-    } else {
-
-      item.reRegNotDone++;
-
-    }
-
-  });
-
-
-  const semesters =
-    [...map.keys()].sort(
-      (a,b) =>
-        String(a).localeCompare(
-          String(b),
-          undefined,
-          {
-            numeric:true,
-
-            sensitivity:'base'
-          }
-        )
-    );
-
-
-  const tbody =
-    document.getElementById(
-      'salesBody'
-    );
-
-
-  if (
-    !semesters.length
-  ) {
-
-    tbody.innerHTML =
-      `
-      <tr>
-
-        <td
-          colspan="9"
-          class="empty"
-        >
-          No data available.
-        </td>
-
-      </tr>
-      `;
-
-    return;
-
-  }
-
-
-  const salesOrder = [
-
-    'Inside Sales',
-
-    'Channel',
-
-    'Other'
-
-  ];
-
-
-  let html = '';
-
-
-  semesters.forEach(
-    semester => {
-
-      const semesterMap =
-        map.get(
-          semester
-        );
-
-
-      salesOrder.forEach(
-        salesType => {
-
-          if (
-            !semesterMap.has(
-              salesType
-            )
-          ) {
-
-            return;
-
-          }
-
-
-          const item =
-            semesterMap.get(
-              salesType
-            );
-
-
-          const total =
-            item.total;
-
-
-          const examAttendedPct =
-            total
-              ? (
-                  item.examAttended /
-                  total *
-                  100
-                )
-              : 0;
-
-
-          const examNotAttendedPct =
-            total
-              ? (
-                  item.examNotAttended /
-                  total *
-                  100
-                )
-              : 0;
-
-
-          const assignmentSubmittedPct =
-            total
-              ? (
-                  item.assignmentSubmitted /
-                  total *
-                  100
-                )
-              : 0;
-
-
-          const assignmentNotSubmittedPct =
-            total
-              ? (
-                  item.assignmentNotSubmitted /
-                  total *
-                  100
-                )
-              : 0;
-
-
-          const reRegDonePct =
-            total
-              ? (
-                  item.reRegDone /
-                  total *
-                  100
-                )
-              : 0;
-
-
-          const reRegNotDonePct =
-            total
-              ? (
-                  item.reRegNotDone /
-                  total *
-                  100
-                )
-              : 0;
-
-
-          let salesClass =
-            'sales-other';
-
-
-          if (
-            salesType ===
-            'Inside Sales'
-          ) {
-
-            salesClass =
-              'sales-inside';
-
-          }
-
-
-          if (
-            salesType ===
-            'Channel'
-          ) {
-
-            salesClass =
-              'sales-channel';
-
-          }
-
-
-          html += `
-
-            <tr>
-
-              <td>
-
-                <span
-                  class="badge badge-blue"
-                >
-                  ${escapeHtml(
-                    semester
-                  )}
-                </span>
-
-              </td>
-
-
-              <td
-                class="${salesClass}"
-              >
-                ${escapeHtml(
-                  salesType
-                )}
-              </td>
-
-
-              <td
-                class="sales-total"
-              >
-                ${total.toLocaleString()}
-                (100.0%)
-              </td>
-
-
-              <td>
-
-                ${item.examAttended.toLocaleString()}
-
-                (${examAttendedPct.toFixed(1)}%)
-
-              </td>
-
-
-              <td>
-
-                ${item.examNotAttended.toLocaleString()}
-
-                (${examNotAttendedPct.toFixed(1)}%)
-
-              </td>
-
-
-              <td>
-
-                ${item.assignmentSubmitted.toLocaleString()}
-
-                (${assignmentSubmittedPct.toFixed(1)}%)
-
-              </td>
-
-
-              <td>
-
-                ${item.assignmentNotSubmitted.toLocaleString()}
-
-                (${assignmentNotSubmittedPct.toFixed(1)}%)
-
-              </td>
-
-
-              <td>
-
-                ${item.reRegDone.toLocaleString()}
-
-                (${reRegDonePct.toFixed(1)}%)
-
-              </td>
-
-
-              <td>
-
-                ${item.reRegNotDone.toLocaleString()}
-
-                (${reRegNotDonePct.toFixed(1)}%)
-
-              </td>
-
-            </tr>
-
-          `;
-
-        }
-      );
-
-    }
-  );
-
-
-  tbody.innerHTML =
-    html || `
-
-      <tr>
-
-        <td
-          colspan="9"
-          class="empty"
-        >
-          No data available.
-        </td>
-
-      </tr>
-
-    `;
-
-}
-
-
-/* =========================================================
-   STATUS COMBINATIONS
-========================================================= */
-
-function renderCombinations() {
-
-  const rows =
-    getFilteredRows();
-
-
-  const combinations = {};
-
-
-  rows.forEach(row => {
-
-    const combination =
-      row.examAttendance +
-      ' + ' +
-      row.assignment +
-      ' + ' +
-      row.reReg;
-
-
-    if (
-      !combinations[
-        combination
-      ]
-    ) {
-
-      combinations[
-        combination
-      ] = 0;
-
-    }
-
-
-    combinations[
-      combination
-    ]++;
-
-  });
-
-
-  const ordered = [
-
-    'Present + Submitted + Done',
-
-    'Present + Submitted + Not Done',
-
-    'Present + Not Submitted + Done',
-
-    'Present + Not Submitted + Not Done',
-
-    'Absent + Submitted + Done',
-
-    'Absent + Submitted + Not Done',
-
-    'Absent + Not Submitted + Done',
-
-    'Absent + Not Submitted + Not Done'
-
-  ];
-
-
-  const total =
-    rows.length;
-
-
-  const tbody =
-    document.getElementById(
-      'combinationBody'
-    );
-
-
-  if (!total) {
-
-    tbody.innerHTML =
-      `
-      <tr>
-
-        <td
-          colspan="4"
-          class="empty"
-        >
-          No data available.
-        </td>
-
-      </tr>
-      `;
-
-    return;
-
-  }
-
-
-  tbody.innerHTML =
-    ordered.map(
-      combination => {
-
-        const count =
-          combinations[
-            combination
-          ] || 0;
-
-
-        const percentage =
-          total
-            ? (
-                count /
-                total *
-                100
-              )
-            : 0;
-
-
-        return `
+        <tbody id="tableBody">
 
           <tr>
 
-            <td>
-              ${escapeHtml(
-                combination
-              )}
-            </td>
+            <td colspan="11">
 
-
-            <td>
-              ${count.toLocaleString()}
-            </td>
-
-
-            <td>
-              ${percentage.toFixed(1)}%
-            </td>
-
-
-            <td
-              style="min-width:220px"
-            >
-
-              <div
-                class="combination-bar"
-              >
-
-                <div
-                  class="combination-fill"
-                  style="width:${percentage}%"
-                ></div>
-
+              <div class="loading">
+                Loading data...
               </div>
 
             </td>
 
           </tr>
 
-        `;
+        </tbody>
 
+      </table>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+let allData = [];
+
+let headers = [];
+
+
+/* =========================
+   LOAD DATA
+========================= */
+
+/* =========================
+   GOOGLE SHEET SETTINGS
+   =========================
+   1. Replace SHEET_ID with your Google Sheet ID.
+   2. Keep SHEET_NAME blank to use the first tab in the spreadsheet.
+   3. If you want a specific tab, enter its exact tab name.
+
+   The Google Sheet must be accessible publicly (for example:
+   "Anyone with the link" -> Viewer), because this dashboard
+   reads the sheet directly from the browser.
+*/
+
+const SHEET_ID = 'PASTE_YOUR_GOOGLE_SHEET_ID_HERE';
+const SHEET_NAME = '';
+
+/* =========================
+   LOAD DATA FROM GOOGLE SHEET
+   ========================= */
+
+function loadData() {
+
+  document.getElementById('tableBody').innerHTML = `
+    <tr>
+      <td colspan="11">
+        <div class="loading">
+          Loading data...
+        </div>
+      </td>
+    </tr>
+  `;
+
+  document.getElementById('error').style.display = 'none';
+
+  if (
+    !SHEET_ID ||
+    SHEET_ID === 'PASTE_YOUR_GOOGLE_SHEET_ID_HERE'
+  ) {
+    handleError({
+      message: 'Please add your Google Sheet ID in the SHEET_ID variable.'
+    });
+    return;
+  }
+
+  let apiUrl =
+    'https://docs.google.com/spreadsheets/d/' +
+    encodeURIComponent(SHEET_ID) +
+    '/gviz/tq?tqx=out:json';
+
+  if (SHEET_NAME.trim() !== '') {
+    apiUrl += '&sheet=' + encodeURIComponent(SHEET_NAME);
+  }
+
+  fetch(apiUrl, {
+    method: 'GET',
+    cache: 'no-store'
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(
+          'Unable to access the Google Sheet. Please check the Sheet ID and sharing permission.'
+        );
       }
-    ).join('');
+
+      return response.text();
+    })
+    .then(text => {
+
+      /*
+       * Google Visualization API returns JSON wrapped like:
+       * google.visualization.Query.setResponse({...});
+       */
+
+      const match = text.match(
+        /google\.visualization\.Query\.setResponse\((.*)\);?\s*$/
+      );
+
+      if (!match) {
+        throw new Error(
+          'Invalid Google Sheet response. Make sure the sheet is publicly accessible.'
+        );
+      }
+
+      const result = JSON.parse(match[1]);
+
+      if (
+        result.status &&
+        result.status.toLowerCase() !== 'ok'
+      ) {
+        throw new Error(
+          result.errors?.[0]?.detailed_message ||
+          result.errors?.[0]?.message ||
+          'Google Sheet returned an error.'
+        );
+      }
+
+      const table = result.table;
+
+      if (!table || !table.cols) {
+        throw new Error(
+          'No data was found in the Google Sheet.'
+        );
+      }
+
+      const sheetHeaders = table.cols.map(
+        (col, index) =>
+          col.label ||
+          col.id ||
+          'Column ' + (index + 1)
+      );
+
+      const rows = (table.rows || []).map(row => {
+
+        return sheetHeaders.map((_, index) => {
+
+          const cell = row.c && row.c[index];
+
+          if (!cell) {
+            return '';
+          }
+
+          /*
+           * Prefer formatted value (f) because Google Sheets
+           * may format dates and numbers for display.
+           */
+          if (cell.f !== undefined && cell.f !== null) {
+            return String(cell.f);
+          }
+
+          if (cell.v !== undefined && cell.v !== null) {
+            return String(cell.v);
+          }
+
+          return '';
+        });
+
+      });
+
+      handleData({
+        headers: sheetHeaders,
+        rows: rows
+      });
+
+    })
+    .catch(error => {
+      handleError({
+        message:
+          error.message ||
+          'Unable to load data from Google Sheet.'
+      });
+    });
 
 }
 
 
-/* =========================================================
-   LEARNER DETAILS
-========================================================= */
+/* =========================
+   HANDLE DATA
+========================= */
 
-function renderLearners() {
+function handleData(result) {
 
-  const rows =
-    getFilteredRows();
+  headers = result.headers || [];
+
+  allData = result.rows || [];
+
+  buildFilters();
+
+  updateKPIs(allData);
+
+  renderTable(allData);
+
+  const now = new Date();
+
+  document.getElementById('lastUpdated').textContent =
+    now.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+}
 
 
-  const tbody =
-    document.getElementById(
-      'learnerBody'
+/* =========================
+   ERROR
+========================= */
+
+function handleError(error) {
+
+  console.error('Dashboard error:', error);
+
+  const errorBox = document.getElementById('error');
+
+  errorBox.innerHTML =
+    '<strong>Unable to load dashboard data.</strong><br>' +
+    escapeHtml(
+      error.message ||
+      'Please check the Google Sheet ID and sharing permissions.'
     );
 
+  errorBox.style.display = 'block';
 
-  if (!rows.length) {
+}
 
-    tbody.innerHTML =
-      `
+
+/* =========================
+   HEADER INDEX
+========================= */
+
+function getIndex(name) {
+
+  return headers.findIndex(
+    h => String(h).trim().toLowerCase() === name.toLowerCase()
+  );
+
+}
+
+
+/* =========================
+   FILTER OPTIONS
+========================= */
+
+function buildFilters() {
+
+  const programIndex = getIndex('Program');
+
+  const dateIndex = getIndex('Date of Convocation');
+
+  const attendanceIndex =
+    getIndex('Convocation Attendance');
+
+
+  /* PROGRAM */
+
+  const programs = [
+    ...new Set(
+      allData
+        .map(row => row[programIndex])
+        .filter(Boolean)
+    )
+  ].sort();
+
+
+  const programSelect =
+    document.getElementById('programFilter');
+
+  programSelect.innerHTML =
+    '<option value="">All Programs</option>';
+
+
+  programs.forEach(program => {
+
+    const option =
+      document.createElement('option');
+
+    option.value = program;
+
+    option.textContent = program;
+
+    programSelect.appendChild(option);
+
+  });
+
+
+  /* DATES */
+
+  const dates = [
+    ...new Set(
+      allData
+        .map(row => row[dateIndex])
+        .filter(Boolean)
+    )
+  ].sort();
+
+
+  const dateSelect =
+    document.getElementById('dateFilter');
+
+  dateSelect.innerHTML =
+    '<option value="">All Convocation Dates</option>';
+
+
+  dates.forEach(date => {
+
+    const option =
+      document.createElement('option');
+
+    option.value = date;
+
+    option.textContent = date;
+
+    dateSelect.appendChild(option);
+
+  });
+
+
+  /* ATTENDANCE */
+
+  const attendanceValues = [
+    ...new Set(
+      allData
+        .map(row => row[attendanceIndex])
+        .filter(Boolean)
+    )
+  ].sort();
+
+
+  const attendanceSelect =
+    document.getElementById('attendanceFilter');
+
+  attendanceSelect.innerHTML =
+    '<option value="">All Attendance</option>';
+
+
+  attendanceValues.forEach(value => {
+
+    const option =
+      document.createElement('option');
+
+    option.value = value;
+
+    option.textContent = value;
+
+    attendanceSelect.appendChild(option);
+
+  });
+
+}
+
+
+/* =========================
+   STATUS LOGIC
+========================= */
+
+function getDispatchStatus(row) {
+
+  const trackingIndex =
+    getIndex('Tracking Number');
+
+  const deliveredIndex =
+    getIndex('Is Delivered');
+
+
+  const tracking =
+    String(row[trackingIndex] || '').trim();
+
+  const delivered =
+    String(row[deliveredIndex] || '')
+      .trim()
+      .toLowerCase();
+
+
+  if (
+    delivered === 'yes' ||
+    delivered === 'true'
+  ) {
+
+    return 'Delivered';
+
+  }
+
+
+  if (tracking !== '') {
+
+    return 'In Transit';
+
+  }
+
+
+  return 'Pending';
+
+}
+
+
+/* =========================
+   KPI
+========================= */
+
+function updateKPIs(data) {
+
+  const total = data.length;
+
+  const attendanceIndex =
+    getIndex('Convocation Attendance');
+
+
+  let attended = 0;
+
+  data.forEach(row => {
+
+    const attendance =
+      String(row[attendanceIndex] || '')
+        .trim()
+        .toLowerCase();
+
+
+    if (
+      attendance === 'in person' ||
+      attendance === 'attended'
+    ) {
+
+      attended++;
+
+    }
+
+  });
+
+
+  const notAttended =
+    total - attended;
+
+
+  let dispatched = 0;
+
+  let pending = 0;
+
+  let delivered = 0;
+
+  let inTransit = 0;
+
+
+  data.forEach(row => {
+
+    const status =
+      getDispatchStatus(row);
+
+
+    if (status === 'Delivered') {
+
+      delivered++;
+
+      dispatched++;
+
+    }
+
+    else if (status === 'In Transit') {
+
+      inTransit++;
+
+      dispatched++;
+
+    }
+
+    else {
+
+      pending++;
+
+    }
+
+  });
+
+
+  document.getElementById('totalLearners')
+    .textContent = formatNumber(total);
+
+
+  document.getElementById('attended')
+    .textContent = formatNumber(attended);
+
+
+  document.getElementById('notAttended')
+    .textContent = formatNumber(notAttended);
+
+
+  document.getElementById('dispatched')
+    .textContent = formatNumber(dispatched);
+
+
+  document.getElementById('pending')
+    .textContent = formatNumber(pending);
+
+
+  document.getElementById('delivered')
+    .textContent = formatNumber(delivered);
+
+
+  document.getElementById('inTransit')
+    .textContent = formatNumber(inTransit);
+
+
+  document.getElementById('attendancePercent')
+    .textContent =
+      percentage(attended, total);
+
+
+  document.getElementById('dispatchPercent')
+    .textContent =
+      percentage(dispatched, total);
+
+
+  document.getElementById('deliveryPercent')
+    .textContent =
+      percentage(delivered, total);
+
+}
+
+
+/* =========================
+   FILTERS
+========================= */
+
+function applyFilters() {
+
+  const search =
+    document.getElementById('search')
+      .value
+      .toLowerCase()
+      .trim();
+
+
+  const program =
+    document.getElementById('programFilter')
+      .value;
+
+
+  const date =
+    document.getElementById('dateFilter')
+      .value;
+
+
+  const attendance =
+    document.getElementById('attendanceFilter')
+      .value;
+
+
+  const status =
+    document.getElementById('statusFilter')
+      .value;
+
+
+  const rollIndex =
+    getIndex('Roll No');
+
+
+  const nameIndex =
+    getIndex('Name');
+
+
+  const programIndex =
+    getIndex('Program');
+
+
+  const dateIndex =
+    getIndex('Date of Convocation');
+
+
+  const attendanceIndex =
+    getIndex('Convocation Attendance');
+
+
+  const trackingIndex =
+    getIndex('Tracking Number');
+
+
+  const filtered =
+    allData.filter(row => {
+
+
+      const roll =
+        String(row[rollIndex] || '')
+          .toLowerCase();
+
+
+      const name =
+        String(row[nameIndex] || '')
+          .toLowerCase();
+
+
+      const tracking =
+        String(row[trackingIndex] || '')
+          .toLowerCase();
+
+
+      if (
+        search &&
+        !roll.includes(search) &&
+        !name.includes(search) &&
+        !tracking.includes(search)
+      ) {
+
+        return false;
+
+      }
+
+
+      if (
+        program &&
+        row[programIndex] !== program
+      ) {
+
+        return false;
+
+      }
+
+
+      if (
+        date &&
+        row[dateIndex] !== date
+      ) {
+
+        return false;
+
+      }
+
+
+      if (
+        attendance &&
+        row[attendanceIndex] !== attendance
+      ) {
+
+        return false;
+
+      }
+
+
+      if (
+        status &&
+        getDispatchStatus(row) !== status
+      ) {
+
+        return false;
+
+      }
+
+
+      return true;
+
+    });
+
+
+  updateKPIs(filtered);
+
+  renderTable(filtered);
+
+}
+
+
+/* =========================
+   TABLE
+========================= */
+
+function renderTable(data) {
+
+  const tbody =
+    document.getElementById('tableBody');
+
+
+  document.getElementById('recordCount')
+    .textContent =
+      formatNumber(data.length) + ' records';
+
+
+  if (!data.length) {
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="11">
+          <div class="empty">
+            No learners found.
+          </div>
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+
+  const rollIndex =
+    getIndex('Roll No');
+
+
+  const nameIndex =
+    getIndex('Name');
+
+
+  const programIndex =
+    getIndex('Program');
+
+
+  const dateIndex =
+    getIndex('Date of Convocation');
+
+
+  const attendanceIndex =
+    getIndex('Convocation Attendance');
+
+
+  const trackingIndex =
+    getIndex('Tracking Number');
+
+
+  const courierIndex =
+    getIndex('Courier Partner');
+
+
+  const deliveredIndex =
+    getIndex('Is Delivered');
+
+
+  const dispatchDateIndex =
+    getIndex('Courier Dispatch Date');
+
+
+  const addressIndex =
+    getIndex('Address');
+
+
+  let html = '';
+
+
+  data.forEach(row => {
+
+    const status =
+      getDispatchStatus(row);
+
+
+    const attendance =
+      row[attendanceIndex] || '—';
+
+
+    const delivered =
+      row[deliveredIndex] || '—';
+
+
+    html += `
+
       <tr>
 
-        <td
-          colspan="8"
-          class="empty"
-        >
-          No learners match the selected filters.
+        <td>
+          <strong>
+            ${escapeHtml(row[rollIndex])}
+          </strong>
+        </td>
+
+
+        <td>
+          ${escapeHtml(row[nameIndex])}
+        </td>
+
+
+        <td>
+          ${escapeHtml(row[programIndex])}
+        </td>
+
+
+        <td>
+          ${escapeHtml(row[dateIndex])}
+        </td>
+
+
+        <td>
+          ${attendanceBadge(attendance)}
+        </td>
+
+
+        <td>
+          ${statusBadge(status)}
+        </td>
+
+
+        <td>
+          ${escapeHtml(row[trackingIndex] || '—')}
+        </td>
+
+
+        <td>
+          ${escapeHtml(row[courierIndex] || '—')}
+        </td>
+
+
+        <td>
+          ${deliveryBadge(delivered)}
+        </td>
+
+
+        <td>
+          ${escapeHtml(row[dispatchDateIndex] || '—')}
+        </td>
+
+
+        <td>
+          ${escapeHtml(row[addressIndex] || '—')}
         </td>
 
       </tr>
-      `;
 
-    return;
+    `;
 
-  }
-
-
-  tbody.innerHTML =
-    rows.map(
-      row => {
-
-        const examClass =
-          row.examAttendance ===
-          'Present'
-            ? 'badge-green'
-            : 'badge-red';
+  });
 
 
-        const assignmentClass =
-          row.assignment ===
-          'Submitted'
-            ? 'badge-green'
-            : 'badge-red';
-
-
-        const reregClass =
-          row.reReg ===
-          'Done'
-            ? 'badge-green'
-            : 'badge-red';
-
-
-        return `
-
-          <tr>
-
-            <td>
-
-              <strong>
-
-                ${escapeHtml(
-                  row.rollNo ||
-                  '—'
-                )}
-
-              </strong>
-
-            </td>
-
-
-            <td>
-
-              ${escapeHtml(
-                row.name ||
-                '—'
-              )}
-
-            </td>
-
-
-            <td>
-
-              ${escapeHtml(
-                row.program ||
-                '—'
-              )}
-
-            </td>
-
-
-            <td>
-
-              ${escapeHtml(
-                row.salesType ||
-                'Other'
-              )}
-
-            </td>
-
-
-            <td>
-
-              <span
-                class="badge ${examClass}"
-              >
-
-                ${escapeHtml(
-                  row.examAttendance
-                )}
-
-              </span>
-
-            </td>
-
-
-            <td>
-
-              <span
-                class="badge ${assignmentClass}"
-              >
-
-                ${escapeHtml(
-                  row.assignment
-                )}
-
-              </span>
-
-            </td>
-
-
-            <td>
-
-              ${escapeHtml(
-                row.semester ||
-                '—'
-              )}
-
-            </td>
-
-
-            <td>
-
-              <span
-                class="badge ${reregClass}"
-              >
-
-                ${escapeHtml(
-                  row.reReg
-                )}
-
-              </span>
-
-            </td>
-
-          </tr>
-
-        `;
-
-      }
-    ).join('');
+  tbody.innerHTML = html;
 
 }
 
 
-/* =========================================================
-   HTML ESCAPE
-========================================================= */
+/* =========================
+   BADGES
+========================= */
+
+function attendanceBadge(value) {
+
+  const text =
+    String(value || '—');
+
+
+  const lower =
+    text.toLowerCase();
+
+
+  if (lower === 'in person') {
+
+    return `
+      <span class="badge green">
+        ${escapeHtml(text)}
+      </span>
+    `;
+
+  }
+
+
+  return `
+    <span class="badge gray">
+      ${escapeHtml(text)}
+    </span>
+  `;
+
+}
+
+
+function statusBadge(status) {
+
+  if (status === 'Delivered') {
+
+    return `
+      <span class="badge green">
+        Delivered
+      </span>
+    `;
+
+  }
+
+
+  if (status === 'In Transit') {
+
+    return `
+      <span class="badge blue">
+        In Transit
+      </span>
+    `;
+
+  }
+
+
+  return `
+    <span class="badge yellow">
+      Dispatch Pending
+    </span>
+  `;
+
+}
+
+
+function deliveryBadge(value) {
+
+  const lower =
+    String(value || '')
+      .toLowerCase();
+
+
+  if (lower === 'yes') {
+
+    return `
+      <span class="badge green">
+        Delivered
+      </span>
+    `;
+
+  }
+
+
+  return `
+    <span class="badge gray">
+      No
+    </span>
+  `;
+
+}
+
+
+/* =========================
+   HELPERS
+========================= */
+
+function formatNumber(number) {
+
+  return Number(number || 0)
+    .toLocaleString('en-IN');
+
+}
+
+
+function percentage(value, total) {
+
+  if (!total) return '0%';
+
+  return (
+    (value / total) * 100
+  ).toFixed(1) + '%';
+
+}
+
 
 function escapeHtml(value) {
 
-  return String(
-    value ?? ''
-  )
-
-    .replace(
-      /&/g,
-      '&amp;'
-    )
-
-    .replace(
-      /</g,
-      '&lt;'
-    )
-
-    .replace(
-      />/g,
-      '&gt;'
-    )
-
-    .replace(
-      /"/g,
-      '&quot;'
-    )
-
-    .replace(
-      /'/g,
-      '&#039;'
-    );
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 
 }
 
 
-/* =========================================================
-   RENDER EVERYTHING
-========================================================= */
-
-function renderAll() {
-
-  renderKPIs();
-
-  renderSemesterAnalysis();
-
-  renderSalesType();
-
-  renderCombinations();
-
-  renderLearners();
-
-}
-
-
-/* =========================================================
-   SET CONNECTION STATUS
-========================================================= */
-
-function setConnectionStatus(
-  message
-) {
-
-  const element =
-    document.getElementById(
-      'connectionStatus'
-    );
-
-
-  if (element) {
-
-    element.textContent =
-      message;
-
-  }
-
-}
-
-
-/* =========================================================
-   LOAD DATA
-========================================================= */
-
-async function loadData() {
-
-  if (refreshBusy) {
-
-    return;
-
-  }
-
-
-  refreshBusy = true;
-
-
-  const refreshButton =
-    document.getElementById(
-      'refreshBtn'
-    );
-
-
-  try {
-
-    setConnectionStatus(
-      'Refreshing Google Sheet…'
-    );
-
-
-    if (refreshButton) {
-
-      refreshButton.disabled =
-        true;
-
-      refreshButton.classList.add(
-        'loading'
-      );
-
-      refreshButton.textContent =
-        '↻ Refreshing…';
-
-    }
-
-
-    /*
-       Fetch latest Google Sheet data.
-    */
-
-    const rows =
-      await fetchSheet();
-
-
-    /*
-       Normalize the newly downloaded data
-       before replacing the current dashboard.
-    */
-
-    const newData =
-      normalizeRows(
-        rows
-      );
-
-
-    /*
-       Only replace RAW after successful
-       download + normalization.
-
-       This means if Google Sheet temporarily
-       fails, the old dashboard stays visible.
-    */
-
-    RAW =
-      newData;
-
-
-    /*
-       Rebuild dropdown values.
-       Existing filter selections are preserved
-       where possible.
-    */
-
-    populateFilters();
-
-
-    /*
-       Render dashboard with current filters.
-    */
-
-    renderAll();
-
-
-    const now =
-      new Date();
-
-
-    setConnectionStatus(
-
-      'Google Sheet connected · ' +
-
-      RAW.length.toLocaleString() +
-
-      ' students · Last refreshed ' +
-
-      now.toLocaleTimeString()
-
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      'Dashboard refresh error:',
-      error
-    );
-
-
-    /*
-       Do NOT clear existing data.
-       Keep the current dashboard visible.
-    */
-
-    setConnectionStatus(
-
-      'Refresh failed · Showing last successful data · ' +
-
-      error.message
-
-    );
-
-
-  } finally {
-
-    refreshBusy =
-      false;
-
-
-    if (refreshButton) {
-
-      refreshButton.disabled =
-        false;
-
-      refreshButton.classList.remove(
-        'loading'
-      );
-
-      refreshButton.textContent =
-        '↻ Refresh Now';
-
-    }
-
-  }
-
-}
-
-
-/* =========================================================
-   RESET FILTERS
-========================================================= */
-
-document.getElementById(
-  'resetBtn'
-).addEventListener(
-  'click',
-  () => {
-
-    document.getElementById(
-      'programFilter'
-    ).value = '';
-
-
-    document.getElementById(
-      'semesterFilter'
-    ).value = '';
-
-
-    document.getElementById(
-      'examFilter'
-    ).value = '';
-
-
-    document.getElementById(
-      'assignmentFilter'
-    ).value = '';
-
-
-    document.getElementById(
-      'reregFilter'
-    ).value = '';
-
-
-    document.getElementById(
-      'searchInput'
-    ).value = '';
-
-
-    renderAll();
-
-  }
-);
-
-
-/* =========================================================
-   MANUAL REFRESH BUTTON
-========================================================= */
-
-document.getElementById(
-  'refreshBtn'
-).addEventListener(
-  'click',
-  () => {
-
-    loadData();
-
-  }
-);
-
-
-/* =========================================================
-   FILTER EVENTS
-========================================================= */
-
-[
-  'programFilter',
-
-  'semesterFilter',
-
-  'examFilter',
-
-  'assignmentFilter',
-
-  'reregFilter'
-
-].forEach(
-  id => {
-
-    document.getElementById(
-      id
-    ).addEventListener(
-      'change',
-      renderAll
-    );
-
-  }
-);
-
-
-/* =========================================================
-   SEARCH EVENT
-========================================================= */
-
-document.getElementById(
-  'searchInput'
-).addEventListener(
-  'input',
-  renderAll
-);
-
-
-/* =========================================================
+/* =========================
    INITIAL LOAD
-========================================================= */
+========================= */
 
-loadData();
+window.onload = function() {
 
+  loadData();
 
-/* =========================================================
-   AUTO REFRESH
-========================================================= */
-
-/*
-   Every 5 minutes.
-
-   5 minutes × 60 seconds ×
-   1000 milliseconds
-
-   = 300000 ms
-*/
-
-refreshTimer =
-  setInterval(
-    loadData,
-    REFRESH_MS
-  );
-
-
-/* =========================================================
-   INITIAL EMPTY RENDER
-========================================================= */
-
-renderAll();
-
+};
 
 </script>
 
 </body>
-
 </html>
